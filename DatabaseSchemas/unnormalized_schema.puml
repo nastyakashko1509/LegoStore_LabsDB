@@ -110,7 +110,7 @@ entity ActivityLog_Лог_Действий {
 }
 
 Category_Категория ||--o{ Product_Товар : "1:M"
-Supplier_Поставщик ||--o{ Product_Товар : "1:M"
+Supplier_Поставщик ||--o{ Product_Товар : "M:M"
 Product_Товар ||--o{ Supply_Поставка : "1:M"
 Supplier_Поставщик ||--o{ Supply_Поставка : "1:M"
 
@@ -119,7 +119,7 @@ Category_Категория ||--o{ Discount_Скидка : "1:M"
 
 Customer_Клиент ||--o{ Order_Заказ : "1:M"
 Order_Заказ ||--o{ OrderItem_Элемент_Заказа : "1:M"
-Product_Товар ||--o{ OrderItem_Элемент_Заказа : "M:M"
+Product_Товар ||--o{ OrderItem_Элемент_Заказа : "1:M"
 
 Customer_Клиент ||--|| Cart_Корзина : "1:1"
 Cart_Корзина ||--o{ CartItem_Элемент_Корзины : "1:M"
