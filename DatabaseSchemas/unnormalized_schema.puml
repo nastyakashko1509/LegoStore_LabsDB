@@ -30,8 +30,8 @@ entity Supplier_Поставщик {
 
 entity Discount_Скидка {
     +id : int [PK]
-    *product_id : int [FK]
-    *category_id : int [FK]
+    product_id : int [FK]
+    category_id : int [FK]
     *percent : float
     *start_date : datetime.date
     *end_date : datetime.date
