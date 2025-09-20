@@ -13,9 +13,9 @@ PRODUCT
 - Supplier (1:M)
 - Supply (1:M)
 - Discount (1:M)
-- OrderItem (1:M)
 - CartItem (1:M)
 - Review (1:M)
+- OrderItem (М:M)
 
 Причины ненормализованности:
 - Атрибуты category_id и supplier_id могут создавать транзитивные зависимости.
