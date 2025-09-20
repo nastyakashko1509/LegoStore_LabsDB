@@ -1,112 +1,112 @@
 @startuml normalized_schema_er
 
 entity Category {
-    +id : INT [PK]
-    name : VARCHAR
-    description : TEXT
+    +id : int [PK]
+    name : string
+    description : string
 }
 
 entity Product {
-    +id : INT [PK]
-    name : VARCHAR
-    price : DECIMAL
-    age_limit : INT
-    category_id : INT [FK]
-    supplier_id : INT [FK]
+    +id : int [PK]
+    name : string
+    price : decimal
+    age_limit : int
+    category_id : int [FK]
+    supplier_id : int [FK]
 }
 
 entity Supplier {
-    +id : INT [PK]
-    name : VARCHAR
-    address : VARCHAR
+    +id : int [PK]
+    name : string
+    address : string
 }
 
 entity Discount {
-    +id : INT [PK]
-    product_id : INT [FK]
-    category_id : INT [FK]
-    percent : DECIMAL
-    start_date : DATE
-    end_date : DATE
+    +id : int [PK]
+    product_id : int [FK]
+    category_id : int [FK]
+    percent : decimal
+    start_date : DateTime
+    end_date : DateTime
 }
 
 entity Supply {
-    +id : INT [PK]
-    product_id : INT [FK]
-    supplier_id : INT [FK]
-    quantity : INT
-    supply_date : DATE
-    supply_price : DECIMAL
+    +id : int [PK]
+    product_id : int [FK]
+    supplier_id : int [FK]
+    quantity : int
+    supply_date : DateTime
+    supply_price : decimal
 }
 
 entity Customer {
-    +id : INT [PK]
-    name : VARCHAR
-    email : VARCHAR
-    phone : VARCHAR
-    password : VARCHAR
+    +id : int [PK]
+    name : string
+    email : string
+    phone : string
+    password : string
 }
 
 entity Order {
-    +id : INT [PK]
-    customer_id : INT [FK]
-    order_date : DATE
-    delivery_date : DATE
-    status : VARCHAR
+    +id : int [PK]
+    customer_id : int [FK]
+    order_date : DateTime
+    delivery_date : DateTime
+    status : string
 }
 
 entity OrderItem {
-    +id : INT [PK]
-    order_id : INT [FK]
-    product_id : INT [FK]
-    quantity : INT
-    total_price : DECIMAL
+    +id : int [PK]
+    order_id : int [FK]
+    product_id : int [FK]
+    quantity : int
+    total_price : decimal
 }
 
 entity Cart {
-    +id : INT [PK]
-    customer_id : INT [FK]
+    +id : int [PK]
+    customer_id : int [FK]
 }
 
 entity CartItem {
-    +id : INT [PK]
-    cart_id : INT [FK]
-    product_id : INT [FK]
-    quantity : INT
+    +id : int [PK]
+    cart_id : int [FK]
+    product_id : int [FK]
+    quantity : int
 }
 
 entity Review {
-    +id : INT [PK]
-    customer_id : INT [FK]
-    product_id : INT [FK]
-    grade : INT
-    comment : TEXT
+    +id : int [PK]
+    customer_id : int [FK]
+    product_id : int [FK]
+    grade : int
+    comment : string
 }
 
 entity Employee {
-    +id : INT [PK]
-    name : VARCHAR
-    email : VARCHAR
-    phone : VARCHAR
-    password : VARCHAR
-    role : VARCHAR
-    passport_id : VARCHAR
+    +id : int [PK]
+    name : string
+    email : string
+    phone : string
+    password : string
+    role : string
+    passport_id : string
 }
 
 entity Admin {
-    +id : INT [PK]
-    name : VARCHAR
-    email : VARCHAR
-    password : VARCHAR
+    +id : int [PK]
+    name : string
+    email : string
+    password : string
 }
 
 entity ActivityLog {
-    +id : INT [PK]
-    user_id : INT [FK]
-    user_type : VARCHAR
-    action : VARCHAR
-    date : DATE
-    time : TIME
+    +id : int [PK]
+    user_id : int [FK]
+    user_type : string
+    action : string
+    date : DateTime
+    time : TimeSpan
 }
 
 Category ||--o{ Product : "1:M"
