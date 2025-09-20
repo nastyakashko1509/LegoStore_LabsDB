@@ -1,0 +1,187 @@
+PRODUCT
+--------
+Атрибуты:
+- id
+- name
+- price
+- age_limit
+- category_id
+- supplier_id
+
+Связи:
+- Category (1:M)
+- Supplier (1:M)
+- Supply (1:M)
+- Discount (1:M)
+- OrderItem (1:M)
+- CartItem (1:M)
+- Review (1:M)
+
+Причины ненормализованности:
+- Атрибуты category_id и supplier_id могут создавать транзитивные зависимости.
+- Discount может дублироваться для продукта и категории.
+
+CATEGORY
+--------
+Атрибуты:
+- id
+- name
+- description
+
+Связи:
+- Product (1:M)
+- Discount (1:M)
+
+Причины ненормализованности:
+- Возможная избыточность скидок.
+
+SUPPLIER
+--------
+Атрибуты:
+- id
+- name
+- address
+
+Связи:
+- Product (1:M)
+- Supply (1:M)
+
+Причины ненормализованности:
+- Дублируется информация о поставщике в Product и Supply.
+
+DISCOUNT
+--------
+Атрибуты:
+- id
+- product_id
+- category_id
+- percent
+- start_date
+- end_date
+
+Связи:
+- Product
+- Category
+
+Причины ненормализованности:
+- Дублирование, возможные пустые поля product_id или category_id.
+
+SUPPLY
+------
+Атрибуты:
+- id
+- product_id
+- supplier_id
+- quantity
+- supply_date
+- supply_price
+
+Связи:
+- Product
+- Supplier
+
+Проблема:
+- Дублируется информация о supplier_id, уже хранящаяся в Product.
+
+CUSTOMER
+--------
+Атрибуты:
+- id
+- name
+- email
+- phone
+- password
+
+Связи:
+- Order
+- Cart
+- Review
+- ActivityLog
+
+Комментарий:
+- Обычно нормализована, если все атрибуты атомарны.
+
+ORDER и ORDERITEM
+----------------
+Order:
+- id
+- customer_id
+- order_date
+- delivery_date
+- status
+
+OrderItem:
+- id
+- order_id
+- product_id
+- quantity
+- total_price
+
+Связи:
+- Order -> OrderItem (1:M)
+- Product -> OrderItem (1:M)
+
+Комментарий:
+- Корректно нормализованы.
+
+CART и CARTITEM
+---------------
+Cart:
+- id
+- customer_id
+
+CartItem:
+- id
+- cart_id
+- product_id
+- quantity
+
+Связи:
+- Cart -> CartItem (1:M)
+- Product -> CartItem (1:M)
+- Customer -> Cart (1:1)
+
+Комментарий:
+- Корректно отражает структуру корзины.
+
+REVIEW
+------
+Атрибуты:
+- id
+- customer_id
+- product_id
+- grade
+- comment
+
+Связи:
+- Customer и Product (1:M)
+
+Комментарий:
+- Нормализована при условии, что отзыв относится к одному продукту и одному клиенту.
+
+EMPLOYEE и ADMIN
+----------------
+Employee:
+- хранит сотрудников
+
+Admin:
+- отдельная таблица для администраторов
+
+Причины ненормализованности:
+- Лучше использовать поле role в Employee или наследование, а не отдельную таблицу.
+
+ACTIVITYLOG
+-----------
+Атрибуты:
+- id
+- user_id
+- user_type
+- action
+- date
+- time
+
+Связи:
+- M:M с Customer, Employee, Admin
+
+Причины ненормализованности:
+- Полиморфная связь с user_type, лучше разделить на отдельные таблицы или использовать нормализованное наследование.

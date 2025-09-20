@@ -1,0 +1,135 @@
+@startuml normalized_schema_er
+
+entity Category {
+    +id : INT [PK]
+    name : VARCHAR
+    description : TEXT
+}
+
+entity Product {
+    +id : INT [PK]
+    name : VARCHAR
+    price : DECIMAL
+    age_limit : INT
+    category_id : INT [FK]
+    supplier_id : INT [FK]
+}
+
+entity Supplier {
+    +id : INT [PK]
+    name : VARCHAR
+    address : VARCHAR
+}
+
+entity Discount {
+    +id : INT [PK]
+    product_id : INT [FK]
+    category_id : INT [FK]
+    percent : DECIMAL
+    start_date : DATE
+    end_date : DATE
+}
+
+entity Supply {
+    +id : INT [PK]
+    product_id : INT [FK]
+    supplier_id : INT [FK]
+    quantity : INT
+    supply_date : DATE
+    supply_price : DECIMAL
+}
+
+entity Customer {
+    +id : INT [PK]
+    name : VARCHAR
+    email : VARCHAR
+    phone : VARCHAR
+    password : VARCHAR
+}
+
+entity Order {
+    +id : INT [PK]
+    customer_id : INT [FK]
+    order_date : DATE
+    delivery_date : DATE
+    status : VARCHAR
+}
+
+entity OrderItem {
+    +id : INT [PK]
+    order_id : INT [FK]
+    product_id : INT [FK]
+    quantity : INT
+    total_price : DECIMAL
+}
+
+entity Cart {
+    +id : INT [PK]
+    customer_id : INT [FK]
+}
+
+entity CartItem {
+    +id : INT [PK]
+    cart_id : INT [FK]
+    product_id : INT [FK]
+    quantity : INT
+}
+
+entity Review {
+    +id : INT [PK]
+    customer_id : INT [FK]
+    product_id : INT [FK]
+    grade : INT
+    comment : TEXT
+}
+
+entity Employee {
+    +id : INT [PK]
+    name : VARCHAR
+    email : VARCHAR
+    phone : VARCHAR
+    password : VARCHAR
+    role : VARCHAR
+    passport_id : VARCHAR
+}
+
+entity Admin {
+    +id : INT [PK]
+    name : VARCHAR
+    email : VARCHAR
+    password : VARCHAR
+}
+
+entity ActivityLog {
+    +id : INT [PK]
+    user_id : INT [FK]
+    user_type : VARCHAR
+    action : VARCHAR
+    date : DATE
+    time : TIME
+}
+
+Category ||--o{ Product : "1:M"
+Supplier ||--o{ Product : "1:M"
+Product ||--o{ Supply : "1:M"
+Supplier ||--o{ Supply : "1:M"
+
+Product ||--o{ Discount : "1:M"
+Category ||--o{ Discount : "1:M"
+
+Customer ||--o{ Order : "1:M"
+Order ||--o{ OrderItem : "1:M"
+Product ||--o{ OrderItem : "1:M"
+
+Customer ||--|| Cart : "1:1"
+Cart ||--o{ CartItem : "1:M"
+Product ||--o{ CartItem : "1:M"
+
+Customer ||--o{ Review : "1:M"
+Product ||--o{ Review : "1:M"
+
+ActivityLog ||--o{ Customer : "M:M"
+ActivityLog ||--o{ Employee : "M:M"
+ActivityLog ||--o{ Admin : "M:M"
+
+@enduml
