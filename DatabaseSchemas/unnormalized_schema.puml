@@ -1,135 +1,135 @@
 @startuml normalized_schema_er
 
-entity Category {
+entity Category_Категория {
     +id : int [PK]
-    name : string
-    description : string
+    name : str
+    description : str
 }
 
-entity Product {
+entity Product_Товар {
     +id : int [PK]
-    name : string
-    price : decimal
+    name : str
+    price : float
     age_limit : int
     category_id : int [FK]
     supplier_id : int [FK]
 }
 
-entity Supplier {
+entity Supplier_Поставщик {
     +id : int [PK]
-    name : string
-    address : string
+    name : str
+    address : str
 }
 
-entity Discount {
+entity Discount_Скидка {
     +id : int [PK]
     product_id : int [FK]
     category_id : int [FK]
-    percent : decimal
-    start_date : DateTime
-    end_date : DateTime
+    percent : float
+    start_date : datetime.date
+    end_date : datetime.date
 }
 
-entity Supply {
+entity Supply_Поставка {
     +id : int [PK]
     product_id : int [FK]
     supplier_id : int [FK]
     quantity : int
-    supply_date : DateTime
-    supply_price : decimal
+    supply_date : datetime.date
+    supply_price : float
 }
 
-entity Customer {
+entity Customer_Клиент {
     +id : int [PK]
-    name : string
-    email : string
-    phone : string
-    password : string
+    name : str
+    email : str
+    phone : str
+    password : str
 }
 
-entity Order {
+entity Order_Заказ {
     +id : int [PK]
     customer_id : int [FK]
-    order_date : DateTime
-    delivery_date : DateTime
-    status : string
+    order_date : datetime.date
+    delivery_date : datetime.date
+    status : str
 }
 
-entity OrderItem {
+entity OrderItem_Элемент_Заказа {
     +id : int [PK]
     order_id : int [FK]
     product_id : int [FK]
     quantity : int
-    total_price : decimal
+    total_price : float
 }
 
-entity Cart {
+entity Cart_Корзина {
     +id : int [PK]
     customer_id : int [FK]
 }
 
-entity CartItem {
+entity CartItem_Элемент_Корзины {
     +id : int [PK]
     cart_id : int [FK]
     product_id : int [FK]
     quantity : int
 }
 
-entity Review {
+entity Review_Отзыв {
     +id : int [PK]
     customer_id : int [FK]
     product_id : int [FK]
     grade : int
-    comment : string
+    comment : str
 }
 
-entity Employee {
+entity Employee_Сотрудник {
     +id : int [PK]
-    name : string
-    email : string
-    phone : string
-    password : string
-    role : string
-    passport_id : string
+    name : str
+    email : str
+    phone : str
+    password : str
+    role : str
+    passport_id : str
 }
 
-entity Admin {
+entity Admin_Администратор {
     +id : int [PK]
-    name : string
-    email : string
-    password : string
+    name : str
+    email : str
+    password : str
 }
 
-entity ActivityLog {
+entity ActivityLog_Лог_Действий {
     +id : int [PK]
     user_id : int [FK]
-    user_type : string
-    action : string
-    date : DateTime
-    time : TimeSpan
+    user_type : str
+    action : str
+    date : datetime.date
+    time : datetime.time
 }
 
-Category ||--o{ Product : "1:M"
-Supplier ||--o{ Product : "1:M"
-Product ||--o{ Supply : "1:M"
-Supplier ||--o{ Supply : "1:M"
+Category_Категория ||--o{ Product_Товар : "1:M"
+Supplier_Поставщик ||--o{ Product_Товар : "1:M"
+Product_Товар ||--o{ Supply_Поставка : "1:M"
+Supplier_Поставщик ||--o{ Supply_Поставка : "1:M"
 
-Product ||--o{ Discount : "1:M"
-Category ||--o{ Discount : "1:M"
+Product_Товар ||--o{ Discount_Скидка : "1:M"
+Category_Категория ||--o{ Discount_Скидка : "1:M"
 
-Customer ||--o{ Order : "1:M"
-Order ||--o{ OrderItem : "1:M"
-Product ||--o{ OrderItem : "1:M"
+Customer_Клиент ||--o{ Order_Заказ : "1:M"
+Order_Заказ ||--o{ OrderItem_Элемент_Заказа : "1:M"
+Product_Товар ||--o{ OrderItem_Элемент_Заказа : "1:M"
 
-Customer ||--|| Cart : "1:1"
-Cart ||--o{ CartItem : "1:M"
-Product ||--o{ CartItem : "1:M"
+Customer_Клиент ||--|| Cart_Корзина : "1:1"
+Cart_Корзина ||--o{ CartItem_Элемент_Корзины : "1:M"
+Product_Товар ||--o{ CartItem_Элемент_Корзины : "1:M"
 
-Customer ||--o{ Review : "1:M"
-Product ||--o{ Review : "1:M"
+Customer_Клиент ||--o{ Review_Отзыв : "1:M"
+Product_Товар ||--o{ Review_Отзыв : "1:M"
 
-ActivityLog ||--o{ Customer : "M:M"
-ActivityLog ||--o{ Employee : "M:M"
-ActivityLog ||--o{ Admin : "M:M"
+ActivityLog_Лог_Действий ||--o{ Customer_Клиент : "M:M"
+ActivityLog_Лог_Действий ||--o{ Employee_Сотрудник : "M:M"
+ActivityLog_Лог_Действий ||--o{ Admin_Администратор : "M:M"
 
 @enduml
