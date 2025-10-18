@@ -83,3 +83,21 @@ UPDATE "user" SET email = 'sergeypavlov@gmail.com' WHERE id = 'eb6421b8-d0f4-429
 -----------------------------------------------
 
 DELETE FROM "user" WHERE id = 'eb6421b8-d0f4-429a-9063-b0972e9882ef'
+
+--------------------
+-- ВЛОЖЕННЫЕ ЗАПРОСЫ
+--------------------
+
+SELECT * FROM product
+WHERE price > (SELECT AVG(price) FROM product);
+
+SELECT * FROM "user"
+WHERE id IN (SELECT client_id FROM "order");
+
+SELECT * FROM "order"
+WHERE id IN (
+    SELECT order_id FROM order_item
+    WHERE product_id IN (
+        SELECT id FROM product WHERE category_id = '...'
+    )
+);
