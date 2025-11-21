@@ -1,4 +1,3 @@
--- Процедура добавления товара в корзину
 CREATE OR REPLACE PROCEDURE add_to_cart(
     p_client_id UUID,
     p_product_id UUID,
@@ -12,7 +11,6 @@ DECLARE
     v_age_limit INT;
     v_client_age INT;
 BEGIN
-    -- Проверяем возрастное ограничение
     SELECT age_limit INTO v_age_limit FROM product WHERE id = p_product_id;
     SELECT EXTRACT(YEAR FROM AGE(birthday)) INTO v_client_age FROM client WHERE id = p_client_id;
     
@@ -20,10 +18,8 @@ BEGIN
         RAISE EXCEPTION 'Возрастное ограничение: %+ лет', v_age_limit;
     END IF;
     
-    -- Получаем ID корзины
     SELECT id INTO v_cart_id FROM cart WHERE client_id = p_client_id;
     
-    -- Получаем текущую цену с учетом скидок
     SELECT COALESCE(
         (SELECT price * (1 - percent/100) 
          FROM discount_product 
@@ -34,7 +30,6 @@ BEGIN
         price
     ) INTO v_current_price FROM product WHERE id = p_product_id;
     
-    -- Добавляем или обновляем товар в корзине
     INSERT INTO cart_item (cart_id, product_id, quantity, added_at)
     VALUES (v_cart_id, p_product_id, p_quantity, CURRENT_TIMESTAMP)
     ON CONFLICT (cart_id, product_id) 
@@ -42,7 +37,6 @@ BEGIN
         quantity = cart_item.quantity + p_quantity,
         added_at = CURRENT_TIMESTAMP;
     
-    -- Логируем действие
     INSERT INTO user_log (user_id, action, created_at)
     VALUES (p_client_id, 'Добавлен товар в корзину: ' || p_product_id, CURRENT_TIMESTAMP);
     
@@ -50,7 +44,6 @@ BEGIN
 END;
 $$;
 
--- Процедура оформления заказа
 CREATE OR REPLACE PROCEDURE create_order(
     p_client_id UUID
 )
@@ -63,26 +56,20 @@ DECLARE
     v_status_id UUID;
     cart_item_record RECORD;
 BEGIN
-    -- Получаем ID корзины
     SELECT id INTO v_cart_id FROM cart WHERE client_id = p_client_id;
     
-    -- Проверяем, что корзина не пуста
     IF NOT EXISTS (SELECT 1 FROM cart_item WHERE cart_id = v_cart_id) THEN
         RAISE EXCEPTION 'Корзина пуста';
     END IF;
     
-    -- Получаем ID статуса "оформлен"
-    SELECT id INTO v_status_id FROM order_status WHERE name = 'оформлен';
+    SELECT id INTO v_status_id FROM order_status WHERE name = 'pending';
     
-    -- Рассчитываем дату доставки (через 3 дня)
     v_delivery_date := CURRENT_TIMESTAMP + INTERVAL '3 days';
     
-    -- Создаем заказ
     INSERT INTO "order" (client_id, delivery_date, status_id)
     VALUES (p_client_id, v_delivery_date, v_status_id)
     RETURNING id INTO v_order_id;
     
-    -- Переносим товары из корзины в заказ
     FOR cart_item_record IN 
         SELECT ci.product_id, ci.quantity, 
                COALESCE(
@@ -102,7 +89,6 @@ BEGIN
         VALUES (v_order_id, cart_item_record.product_id, cart_item_record.quantity, cart_item_record.unit_price);
     END LOOP;
     
-    -- Логируем действие
     INSERT INTO user_log (user_id, action, created_at)
     VALUES (p_client_id, 'Оформлен заказ: ' || v_order_id, CURRENT_TIMESTAMP);
     
@@ -110,7 +96,6 @@ BEGIN
 END;
 $$;
 
--- Процедура получения корзины с расчетом стоимости
 CREATE OR REPLACE FUNCTION get_cart_with_totals(p_client_id UUID)
 RETURNS TABLE(
     product_id UUID,
