@@ -1,4 +1,3 @@
--- Процедура изменения роли пользователя
 CREATE OR REPLACE PROCEDURE change_user_role(
     p_user_id UUID,
     p_new_role_name VARCHAR(50)
@@ -9,7 +8,6 @@ DECLARE
     v_new_role_id UUID;
     v_current_role_name VARCHAR(50);
 BEGIN
-    -- Получаем ID новой роли
     SELECT id INTO v_new_role_id FROM role WHERE name = p_new_role_name;
     
     -- Получаем текущую роль
@@ -22,10 +20,9 @@ BEGIN
         RAISE EXCEPTION 'Роль % не найдена', p_new_role_name;
     END IF;
     
-    -- Обновляем роль пользователя
     UPDATE "user" SET role_id = v_new_role_id WHERE id = p_user_id;
     
-    -- Удаляем старую роль и добавляем новую
+    -- Удаляем старую роль 
     IF v_current_role_name = 'client' THEN
         DELETE FROM client WHERE id = p_user_id;
     ELSIF v_current_role_name = 'employee' THEN
@@ -34,7 +31,7 @@ BEGIN
         DELETE FROM admin WHERE id = p_user_id;
     END IF;
     
-    -- Добавляем запись в соответствующую таблицу (без паспортных данных для простоты)
+    -- Добавляем запись в соответствующую таблицу 
     IF p_new_role_name = 'client' THEN
         INSERT INTO client (id, birthday) VALUES (p_user_id, CURRENT_DATE - INTERVAL '18 years');
     ELSIF p_new_role_name = 'employee' THEN
@@ -58,7 +55,7 @@ CREATE OR REPLACE FUNCTION get_user_logs(
     p_end_date TIMESTAMP DEFAULT NULL,
     p_action_filter VARCHAR(255) DEFAULT NULL
 )
-RETURNS TABLE(
+RETURNS TABLE( -- Функция возвращает таблицу со столбцами
     log_id UUID,
     user_name VARCHAR(100),
     user_email VARCHAR(100),
@@ -68,7 +65,7 @@ RETURNS TABLE(
 LANGUAGE plpgsql
 AS $$
 BEGIN
-    RETURN QUERY
+    RETURN QUERY -- Вернуть результат следующего запроса
     SELECT 
         ul.id,
         u.name,
