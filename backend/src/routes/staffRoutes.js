@@ -34,8 +34,7 @@ router.post(
     body('statusName').notEmpty(),
     body('items').isArray({ min: 1 }),
     body('items.*.product_id').matches(/^[0-9a-fA-F-]{36}$/),
-    body('items.*.quantity').isInt({ gt: 0 }),
-    body('items.*.unit_cost').isFloat({ gt: 0 })
+    body('items.*.quantity').isInt({ gt: 0 })
   ],
   registerSupply
 );

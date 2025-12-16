@@ -45,13 +45,13 @@ export const login = async (req, res, next) => {
     );
 
     if (!result.rowCount) {
-      return res.status(401).json({ message: 'Invalid credentials' });
+      return res.status(401).json({ message: 'Пользователь не найден' });
     }
 
     const user = result.rows[0];
     const match = await bcrypt.compare(password, user.password);
     if (!match) {
-      return res.status(401).json({ message: 'Invalid credentials' });
+      return res.status(401).json({ message: 'Неверный пароль' });
     }
 
     const token = jwt.sign(
@@ -74,6 +74,7 @@ export const me = async (req, res, next) => {
     return next(err);
   }
 };
+
 
 
 

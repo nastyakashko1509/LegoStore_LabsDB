@@ -9,8 +9,27 @@ export const registerSupply = async (req, res, next) => {
     }
 
     const { supplierId, supplyDate, statusName, items } = req.body;
-    // items ожидается массив объектов { product_id, quantity, unit_cost }
-    const jsonb = JSON.stringify(items || []);
+
+    // Если закупочная цена не указана, берём текущую цену товара
+    const productIds = [...new Set((items || []).map((i) => i.product_id))];
+    let priceMap = {};
+    if (productIds.length) {
+      const resPrices = await query(
+        'SELECT id, price FROM product WHERE id = ANY($1::uuid[])',
+        [productIds]
+      );
+      priceMap = Object.fromEntries(resPrices.rows.map((r) => [r.id, r.price]));
+    }
+
+    const normalizedItems = (items || []).map((i) => ({
+      product_id: i.product_id,
+      quantity: i.quantity,
+      unit_cost: i.unit_cost && Number(i.unit_cost) > 0
+        ? i.unit_cost
+        : priceMap[i.product_id] ?? 0
+    }));
+
+    const jsonb = JSON.stringify(normalizedItems);
     await callProcedure('CALL register_supply($1,$2,$3,$4,$5)', [
       supplierId,
       supplyDate,
@@ -40,12 +59,14 @@ export const listSupplies = async (_req, res, next) => {
         s.id,
         s.supply_date,
         s.created_at,
-        s.total_quantity,
+        COALESCE(SUM(si.quantity_for_delivery), 0) AS total_quantity,
         sup.name AS supplier_name,
         st.name AS status_name
       FROM supply s
       JOIN supplier sup ON sup.id = s.supplier_id
       JOIN supply_status st ON st.id = s.status_id
+      LEFT JOIN supply_item si ON si.supply_id = s.id
+      GROUP BY s.id, s.supply_date, s.created_at, sup.name, st.name
       ORDER BY s.supply_date DESC, s.created_at DESC
     `;
     const result = await query(sql);

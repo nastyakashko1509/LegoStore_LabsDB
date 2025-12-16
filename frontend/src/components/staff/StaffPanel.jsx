@@ -28,7 +28,7 @@ const StaffPanel = () => {
   });
   const [supplyStatuses, setSupplyStatuses] = useState([]);
   const [supplyItems, setSupplyItems] = useState([
-    { productId: '', quantity: 1, unitCost: 0 }
+    { productId: '', quantity: 1 }
   ]);
   const [supplies, setSupplies] = useState([]);
   const [supplyItemsById, setSupplyItemsById] = useState({});
@@ -147,7 +147,7 @@ const StaffPanel = () => {
         items
       });
       setMessage('Поставка зарегистрирована');
-      setSupplyItems([{ productId: '', quantity: 1, unitCost: 0 }]);
+      setSupplyItems([{ productId: '', quantity: 1 }]);
       await loadSupplies();
     } catch (err) {
       setMessage(err.message);
@@ -276,20 +276,6 @@ const StaffPanel = () => {
                   }}
                 />
               </div>
-              <div className="field" style={{ width: 140 }}>
-                <label>Закуп. цена</label>
-                <input
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={it.unitCost}
-                  onChange={(e) => {
-                    const next = [...supplyItems];
-                    next[idx].unitCost = e.target.value;
-                    setSupplyItems(next);
-                  }}
-                />
-              </div>
               <button
                 className="secondary"
                 type="button"
@@ -304,7 +290,7 @@ const StaffPanel = () => {
             <button
               type="button"
               className="secondary"
-              onClick={() => setSupplyItems([...supplyItems, { productId: '', quantity: 1, unitCost: 0 }])}
+              onClick={() => setSupplyItems([...supplyItems, { productId: '', quantity: 1 }])}
             >
               Добавить товар
             </button>
