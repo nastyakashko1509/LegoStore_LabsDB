@@ -1,3 +1,48 @@
-*.docx
+.DS_Store
+Thumbs.db
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+node_modules/
+coverage/
+dist/
+build/
+.cache/
+.parcel-cache/
+.vite/
+
+# Env and secrets
+.env
+.env.*
+!.env.example
+!.env.sample
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# OS
+*.swp
+*.swo
+~*
+
+# Backend
+backend/node_modules/
+backend/coverage/
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# Artifacts
+*.tmp
+*.temp
+*.bak
+*.orig
 *.doc
 ~$*

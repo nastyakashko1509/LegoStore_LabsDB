@@ -88,6 +88,18 @@ BEGIN
         INSERT INTO order_item (order_id, product_id, quantity, unit_price)
         VALUES (v_order_id, cart_item_record.product_id, cart_item_record.quantity, cart_item_record.unit_price);
     END LOOP;
+
+    -- Пересчёт суммы заказа (дополнительно к триггеру)
+    UPDATE "order"
+    SET total_amount = (
+        SELECT COALESCE(SUM(quantity * unit_price), 0)
+        FROM order_item
+        WHERE order_id = v_order_id
+    )
+    WHERE id = v_order_id;
+
+    -- Очищаем корзину после копирования позиций
+    DELETE FROM cart_item WHERE cart_id = v_cart_id;
     
     INSERT INTO user_log (user_id, action, created_at)
     VALUES (p_client_id, 'Оформлен заказ: ' || v_order_id, CURRENT_TIMESTAMP);

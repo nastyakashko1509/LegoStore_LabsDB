@@ -23,7 +23,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
---DROP TRIGGER IF EXISTS trigger_calculate_order_total ON order_item;
+DROP TRIGGER IF EXISTS trigger_calculate_order_total ON order_item;
 CREATE TRIGGER trigger_calculate_order_total
     AFTER INSERT OR UPDATE OR DELETE ON order_item
     FOR EACH ROW
@@ -32,17 +32,14 @@ CREATE TRIGGER trigger_calculate_order_total
 CREATE OR REPLACE FUNCTION clear_cart_after_order()
 RETURNS TRIGGER AS $$
 BEGIN
-    IF NEW.status_id = (SELECT id FROM order_status WHERE name = 'pending') THEN --pending - оформлен
-        DELETE FROM cart_item 
-        WHERE cart_id = (SELECT id FROM cart WHERE client_id = NEW.client_id);
-        
-        INSERT INTO user_log (user_id, action, created_at)
-        VALUES (NEW.client_id, 'Корзина очищена после оформления заказа', CURRENT_TIMESTAMP);
-    END IF;
+    -- Логику очистки корзины перенесли в процедуру create_order,
+    -- чтобы сначала скопировать позиции в order_item, а потом чистить корзину.
+    -- Здесь оставляем пустую заглушку.
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS trigger_clear_cart_after_order ON "order";
 CREATE TRIGGER trigger_clear_cart_after_order
     AFTER INSERT ON "order"
     FOR EACH ROW
