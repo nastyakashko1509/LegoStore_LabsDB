@@ -20,7 +20,7 @@ const App = () => {
           <Link to="/">Каталог</Link>
           {user?.role === 'client' && <Link to="/cart">Корзина</Link>}
           {user?.role === 'client' && <Link to="/reviews">Отзывы</Link>}
-          {user && <Link to="/orders">Мои заказы</Link>}
+          {user?.role === 'client' && <Link to="/orders">Мои заказы</Link>}
           {(user?.role === 'employee' || user?.role === 'admin') && <Link to="/staff">Панель сотрудника</Link>}
           {user?.role === 'admin' && <Link to="/admin">Админка</Link>}
         </div>

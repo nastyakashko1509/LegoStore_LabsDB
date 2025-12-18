@@ -11,7 +11,6 @@ export async function query(sql, params = []) {
 }
 
 export async function callProcedure(sql, params = []) {
-  // Процедуры уже могут управлять транзакцией сами, поэтому вызываем напрямую
   const client = await pool.connect();
   try {
     const result = await client.query(sql, params);

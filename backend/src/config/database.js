@@ -1,7 +1,7 @@
 import pg from 'pg';
 import dotenv from 'dotenv';
 
-dotenv.config();
+dotenv.config(); // Загрузка переменных из .env
 
 const pool = new pg.Pool({
   connectionString: process.env.DATABASE_URL,
@@ -14,6 +14,7 @@ pool.on('error', (err) => {
 });
 
 export default pool;
+
 
 
 

@@ -70,6 +70,22 @@ export const listMyReviews = async (req, res, next) => {
   }
 };
 
+export const deleteMyReview = async (req, res, next) => {
+  try {
+    const clientId = req.user.userId;
+    const { productId } = req.params;
+    const sql = 'DELETE FROM review WHERE client_id = $1 AND product_id = $2';
+    const result = await query(sql, [clientId, productId]);
+    if (!result.rowCount) {
+      return res.status(404).json({ message: 'Отзыв не найден' });
+    }
+    return res.status(204).send();
+  } catch (err) {
+    return next(err);
+  }
+};
+
+
 
 
 

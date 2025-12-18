@@ -5,14 +5,9 @@ import { useAuth } from '../../context/AuthContext.jsx';
 const analyticsList = [
   'usersWithLargeCart',
   'expensiveProducts',
-  'ordersOverThreshold',
-  'rankProductsByCategory',
-  'brandProductCounts',
   'supplierProductCounts',
-  'legoFans',
   'cartStats',
-  'reviewsMissing',
-  'categoryAverages'
+  'reviewsMissing'
 ];
 
 const AdminPanel = () => {

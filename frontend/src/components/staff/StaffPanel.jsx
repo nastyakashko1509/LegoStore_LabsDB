@@ -8,6 +8,7 @@ const StaffPanel = () => {
   const [statuses, setStatuses] = useState([]);
   const [customers, setCustomers] = useState([]);
   const [message, setMessage] = useState('');
+  const [products, setProducts] = useState([]);
 
   const [discountForm, setDiscountForm] = useState({
     productId: '',
@@ -40,7 +41,17 @@ const StaffPanel = () => {
     loadCustomers();
     loadSupplyStatuses();
     loadSupplies();
+    loadProducts();
   }, [user]);
+
+  const loadProducts = async () => {
+    try {
+      const data = await api.get('/products');
+      setProducts(data);
+    } catch (err) {
+      /* noop */
+    }
+  };
 
   const loadOrders = async () => {
     try {
@@ -131,8 +142,7 @@ const StaffPanel = () => {
         .filter((it) => it.productId && Number(it.quantity) > 0)
         .map((it) => ({
           product_id: it.productId,
-          quantity: Number(it.quantity),
-          unit_cost: Number(it.unitCost)
+          quantity: Number(it.quantity)
         }));
 
       if (!items.length) {
@@ -168,8 +178,7 @@ const StaffPanel = () => {
         {orders.map((o) => (
           <div key={o.id} className="card row" style={{ justifyContent: 'space-between' }}>
             <div>
-              <b>№ {o.id}</b>
-              <div>Клиент: {o.client_name} ({o.client_email})</div>
+              <b>Клиент: {o.client_name} ({o.client_email})</b>
               <div>Статус: {o.status}</div>
               <div>Сумма: {o.total_amount}</div>
             </div>
@@ -190,8 +199,16 @@ const StaffPanel = () => {
         <h3>Скидка на товар</h3>
         <form onSubmit={submitDiscount} className="row" style={{ alignItems: 'flex-end', gap: 12 }}>
           <div className="field">
-            <label>Product ID</label>
-            <input value={discountForm.productId} onChange={(e) => setDiscountForm({ ...discountForm, productId: e.target.value })} />
+            <label>Товар</label>
+            <select
+              value={discountForm.productId}
+              onChange={(e) => setDiscountForm({ ...discountForm, productId: e.target.value })}
+            >
+              <option value="">Выберите товар</option>
+              {products.map((p) => (
+                <option key={p.id} value={p.id}>{p.name}</option>
+              ))}
+            </select>
           </div>
           <div className="field">
             <label>%</label>
@@ -213,8 +230,16 @@ const StaffPanel = () => {
         <h3>Изменение цены</h3>
         <form onSubmit={submitPrice} className="row" style={{ alignItems: 'flex-end', gap: 12 }}>
           <div className="field">
-            <label>Product ID</label>
-            <input value={priceForm.productId} onChange={(e) => setPriceForm({ ...priceForm, productId: e.target.value })} />
+            <label>Товар</label>
+            <select
+              value={priceForm.productId}
+              onChange={(e) => setPriceForm({ ...priceForm, productId: e.target.value })}
+            >
+              <option value="">Выберите товар</option>
+              {products.map((p) => (
+                <option key={p.id} value={p.id}>{p.name}</option>
+              ))}
+            </select>
           </div>
           <div className="field">
             <label>Новая цена</label>
@@ -252,16 +277,20 @@ const StaffPanel = () => {
           {supplyItems.map((it, idx) => (
             <div key={idx} className="row" style={{ alignItems: 'flex-end', gap: 8 }}>
               <div className="field" style={{ minWidth: 180 }}>
-                <label>Product ID</label>
-                <input
+                <label>Товар</label>
+                <select
                   value={it.productId}
                   onChange={(e) => {
                     const next = [...supplyItems];
                     next[idx].productId = e.target.value;
                     setSupplyItems(next);
                   }}
-                  placeholder="UUID товара"
-                />
+                >
+                  <option value="">Выберите товар</option>
+                  {products.map((p) => (
+                    <option key={p.id} value={p.id}>{p.name}</option>
+                  ))}
+                </select>
               </div>
               <div className="field" style={{ width: 110 }}>
                 <label>Кол-во</label>

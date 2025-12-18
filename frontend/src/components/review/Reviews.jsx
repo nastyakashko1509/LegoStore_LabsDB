@@ -8,6 +8,7 @@ const Reviews = () => {
   const [myReviews, setMyReviews] = useState([]);
   const [form, setForm] = useState({ productId: '', comment: '', rating: 5 });
   const [message, setMessage] = useState('');
+  const [editing, setEditing] = useState(false);
 
   useEffect(() => {
     if (!user || user.role !== 'client') return;
@@ -41,6 +42,7 @@ const Reviews = () => {
         rating: Number(form.rating)
       });
       setForm({ productId: '', comment: '', rating: 5 });
+      setEditing(false);
       await load();
     } catch (err) {
       setMessage(err.message);
@@ -85,7 +87,7 @@ const Reviews = () => {
             />
           </div>
           {message && <p style={{ color: 'red' }}>{message}</p>}
-          <button type="submit">Сохранить отзыв</button>
+          <button type="submit">{editing ? 'Обновить отзыв' : 'Сохранить отзыв'}</button>
         </form>
       </div>
 
@@ -97,6 +99,36 @@ const Reviews = () => {
           <div style={{ fontSize: 12, opacity: 0.7 }}>
             {new Date(r.created_at).toLocaleString()}
           </div>
+          <div className="row" style={{ marginTop: 8 }}>
+            <button
+              type="button"
+              className="secondary"
+              onClick={() => {
+                setForm({ productId: r.product_id, comment: r.comment, rating: r.rating });
+                setEditing(true);
+              }}
+            >
+              Редактировать
+            </button>
+            <button
+              type="button"
+              className="secondary"
+              onClick={async () => {
+                try {
+                  await api.delete(`/reviews/${r.product_id}`);
+                  if (form.productId === r.product_id) {
+                    setForm({ productId: '', comment: '', rating: 5 });
+                    setEditing(false);
+                  }
+                  await load();
+                } catch (err) {
+                  setMessage(err.message);
+                }
+              }}
+            >
+              Удалить
+            </button>
+          </div>
         </div>
       ))}
     </div>
@@ -104,6 +136,7 @@ const Reviews = () => {
 };
 
 export default Reviews;
+
 
 
 

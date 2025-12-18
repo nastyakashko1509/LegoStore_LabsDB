@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { body, param } from 'express-validator';
 import { authenticate, authorize } from '../middleware/authMiddleware.js';
-import { createOrUpdateReview, listMyReviews, listProductReviews } from '../controllers/reviewController.js';
+import { createOrUpdateReview, deleteMyReview, listMyReviews, listProductReviews } from '../controllers/reviewController.js';
 
 const router = Router();
 
@@ -20,6 +20,16 @@ router.post(
 );
 
 router.get('/me', listMyReviews);
+
+router.delete(
+  '/:productId',
+  [
+    param('productId')
+      .matches(/^[0-9a-fA-F-]{36}$/)
+      .withMessage('productId must be UUID')
+  ],
+  deleteMyReview
+);
 
 router.get(
   '/product/:productId',

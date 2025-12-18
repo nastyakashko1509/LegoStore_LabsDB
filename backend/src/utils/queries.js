@@ -1,5 +1,3 @@
-// Centralized SQL snippets to keep controllers lean and enforce parameterization
-
 export const authQueries = {
   login: 'SELECT * FROM login_user($1, $2)'
 };
@@ -27,10 +25,21 @@ export const orderQueries = {
       o.order_date,
       o.delivery_date,
       COALESCE(SUM(oi.quantity * oi.unit_price), 0)::DECIMAL(10,2) AS total_amount,
-      os.name AS status
+      os.name AS status,
+      COALESCE(
+        json_agg(
+          json_build_object(
+            'product_name', p.name,
+            'quantity', oi.quantity,
+            'unit_price', oi.unit_price
+          )
+        ) FILTER (WHERE oi.id IS NOT NULL),
+        '[]'
+      ) AS items
     FROM "order" o
     JOIN order_status os ON os.id = o.status_id
     LEFT JOIN order_item oi ON oi.order_id = o.id
+    LEFT JOIN product p ON p.id = oi.product_id
     WHERE o.client_id = $1
     GROUP BY o.id, o.order_date, o.delivery_date, os.name
     ORDER BY o.order_date DESC
@@ -55,9 +64,9 @@ export const orderQueries = {
   updateStatus: 'UPDATE "order" SET status_id = $2 WHERE id = $1 RETURNING *'
 };
 
-// Mapped analytics queries sourced from complex_request_pool.sql
 export const analyticsQueries = {
-  usersWithLargeCart: `
+  // клиенты с корзиной > 2
+  usersWithLargeCart: ` 
     SELECT u.id, u.name, COUNT(ci.id) AS cart_items_count
     FROM "user" u
     JOIN client c ON c.id = u.id
@@ -66,36 +75,13 @@ export const analyticsQueries = {
     GROUP BY u.id, u.name
     HAVING COUNT(ci.id) > 2;
   `,
+  // товары дороже средней цены
   expensiveProducts: `
     SELECT p.id, p.name, p.price
     FROM product p
     WHERE p.price > (SELECT AVG(price) FROM product);
   `,
-  ordersOverThreshold: `
-    SELECT o.id, o.order_date, o.delivery_date,
-           SUM(p.price * oi.quantity) AS total_amount
-    FROM "order" o
-    JOIN order_item oi ON oi.order_id = o.id
-    JOIN product p ON oi.product_id = p.id
-    GROUP BY o.id, o.order_date, o.delivery_date
-    HAVING SUM(p.price * oi.quantity) > $1
-           AND o.delivery_date > o.order_date + INTERVAL '3 days';
-  `,
-  rankProductsByCategory: `
-    SELECT p.name AS product_name,
-           c.name AS category_name,
-           p.price,
-           RANK() OVER(PARTITION BY c.id ORDER BY p.price DESC) AS price_rank
-    FROM product p
-    JOIN category c ON p.category_id = c.id;
-  `,
-  brandProductCounts: `
-    SELECT b.name AS brand_name, COUNT(p.id) AS product_count
-    FROM product p
-    LEFT JOIN brand b ON p.brand_id = b.id
-    GROUP BY b.name
-    ORDER BY product_count DESC;
-  `,
+  // количество товаров у каждого поставщика
   supplierProductCounts: `
     SELECT s.name AS supplier_name, COUNT(ps.product_id) AS product_count
     FROM product_supplier ps
@@ -103,16 +89,7 @@ export const analyticsQueries = {
     GROUP BY s.name
     ORDER BY product_count DESC;
   `,
-  legoFans: `
-    SELECT DISTINCT u.name
-    FROM "user" u
-    JOIN client c ON c.id = u.id
-    JOIN cart ca ON ca.client_id = c.id
-    JOIN cart_item ci ON ci.cart_id = ca.id
-    JOIN product p ON p.id = ci.product_id
-    JOIN brand b ON b.id = p.brand_id
-    WHERE b.name LIKE 'Lego%';
-  `,
+  // статистика по корзинам
   cartStats: `
     SELECT u.id,
            u.name,
@@ -126,20 +103,12 @@ export const analyticsQueries = {
     GROUP BY u.id, u.name
     HAVING COUNT(ci.id) > 3 AND AVG(p.price) > 50;
   `,
+  // товары без отзывово
   reviewsMissing: `
     SELECT p.id AS product_id, p.name AS product_name
     FROM product p
     LEFT JOIN review r ON r.product_id = p.id
     WHERE r.id IS NULL;
-  `,
-  categoryAverages: `
-    SELECT c.name AS category_name,
-           COUNT(p.id) AS product_count,
-           AVG(p.price) AS avg_price
-    FROM product p
-    JOIN category c ON p.category_id = c.id
-    GROUP BY c.name
-    ORDER BY product_count DESC;
   `
 };
 
