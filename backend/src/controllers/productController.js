@@ -55,7 +55,6 @@ export const listProducts = async (req, res, next) => {
     if (sort === 'ageAsc') orderBy = 'ORDER BY p.age_limit ASC';
     if (sort === 'ageDesc') orderBy = 'ORDER BY p.age_limit DESC';
     if (sort === 'popular') {
-      // популярность по количеству заказов
       orderBy = 'ORDER BY COALESCE(o_count.order_count, 0) DESC';
     }
 

@@ -17,7 +17,6 @@ const Catalog = () => {
 
   useEffect(() => {
     loadProducts();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const loadProducts = async (f = filters) => {
