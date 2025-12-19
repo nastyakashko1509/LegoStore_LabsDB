@@ -352,52 +352,33 @@ const StaffPanel = () => {
       </div>
 
       <div className="card">
-        <h3>Новая поставка</h3>
+        <h3>Поставка</h3>
         <form onSubmit={submitSupply} className="row" style={{ alignItems: 'flex-end', gap: 12 }}>
           <div className="field">
-            <label>Поставщик</label>
-            <select
-              value={supplyForm.supplierId}
-              onChange={(e) => setSupplyForm({ ...supplyForm, supplierId: e.target.value })}
-              required
-            >
-              <option value="">Выберите поставщика</option>
-              {suppliers.map((s) => (
-                <option key={s.id} value={s.id}>{s.name} {s.contact && `(${s.contact})`}</option>
-              ))}
-            </select>
+            <label>Supplier ID</label>
+            <input value={supplyForm.supplierId} onChange={(e) => setSupplyForm({ ...supplyForm, supplierId: e.target.value })} />
           </div>
           <div className="field">
-            <label>Дата поставки</label>
-            <input 
-              type="date" 
-              value={supplyForm.supplyDate} 
-              onChange={(e) => setSupplyForm({ ...supplyForm, supplyDate: e.target.value })} 
-              min={getCurrentDate()}
-              required
-            />
+            <label>Дата</label>
+            <input type="date" value={supplyForm.supplyDate} onChange={(e) => setSupplyForm({ ...supplyForm, supplyDate: e.target.value })} />
           </div>
           <div className="field">
             <label>Статус</label>
-            <select 
-              value={supplyForm.statusName} 
-              onChange={(e) => setSupplyForm({ ...supplyForm, statusName: e.target.value })}
-              required
-            >
-              <option value="">Выберите статус</option>
+            <select value={supplyForm.statusName} onChange={(e) => setSupplyForm({ ...supplyForm, statusName: e.target.value })}>
+              <option value="">Выбрать</option>
               {supplyStatuses.map((s) => (
                 <option key={s.id} value={s.name}>{s.name}</option>
               ))}
             </select>
           </div>
-          <button type="submit">Создать поставку</button>
+          <button type="submit">Создать</button>
         </form>
 
-        <div className="card" style={{ background: '#f8fafc', marginTop: '20px' }}>
+        <div className="card" style={{ background: '#f8fafc' }}>
           <h4>Позиции поставки</h4>
           {supplyItems.map((it, idx) => (
-            <div key={idx} className="row" style={{ alignItems: 'flex-end', gap: 8, marginBottom: '10px' }}>
-              <div className="field" style={{ flex: 1, minWidth: '200px' }}>
+            <div key={idx} className="row" style={{ alignItems: 'flex-end', gap: 8 }}>
+              <div className="field" style={{ minWidth: 180 }}>
                 <label>Товар</label>
                 <select
                   value={it.productId}
@@ -406,16 +387,15 @@ const StaffPanel = () => {
                     next[idx].productId = e.target.value;
                     setSupplyItems(next);
                   }}
-                  required={supplyItems.length > 0}
                 >
                   <option value="">Выберите товар</option>
                   {products.map((p) => (
-                    <option key={p.id} value={p.id}>{p.name} (в наличии: {p.stock || 0})</option>
+                    <option key={p.id} value={p.id}>{p.name}</option>
                   ))}
                 </select>
               </div>
-              <div className="field" style={{ width: '120px' }}>
-                <label>Количество</label>
+              <div className="field" style={{ width: 110 }}>
+                <label>Кол-во</label>
                 <input
                   type="number"
                   min="1"
@@ -425,34 +405,25 @@ const StaffPanel = () => {
                     next[idx].quantity = e.target.value;
                     setSupplyItems(next);
                   }}
-                  required={supplyItems.length > 0}
                 />
               </div>
               <button
                 className="secondary"
                 type="button"
-                onClick={() => {
-                  if (supplyItems.length > 1) {
-                    setSupplyItems(supplyItems.filter((_, i) => i !== idx));
-                  } else {
-                    // Если последний элемент, просто очищаем его
-                    const next = [...supplyItems];
-                    next[idx] = { productId: '', quantity: 1 };
-                    setSupplyItems(next);
-                  }
-                }}
+                onClick={() => setSupplyItems(supplyItems.filter((_, i) => i !== idx))}
+                disabled={supplyItems.length === 1}
               >
-                {supplyItems.length > 1 ? 'Удалить' : 'Очистить'}
+                Удалить
               </button>
             </div>
           ))}
-          <div className="row" style={{ marginTop: '10px' }}>
+          <div className="row">
             <button
               type="button"
               className="secondary"
               onClick={() => setSupplyItems([...supplyItems, { productId: '', quantity: 1 }])}
             >
-              + Добавить товар
+              Добавить товар
             </button>
           </div>
         </div>

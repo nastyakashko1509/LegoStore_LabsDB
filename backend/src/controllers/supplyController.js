@@ -30,13 +30,29 @@ export const registerSupply = async (req, res, next) => {
     }));
 
     const jsonb = JSON.stringify(normalizedItems);
-    await callProcedure('CALL register_supply($1,$2,$3,$4,$5)', [
-      supplierId,
-      supplyDate,
-      statusName,
-      jsonb,
-      req.user.userId
-    ]);
+    const userId = req.user?.userId;
+    // Если процедура с 5 параметрами существует, используем её, иначе вызываем старую версию
+    try {
+      await callProcedure('CALL register_supply($1::uuid,$2::date,$3::varchar,$4::jsonb,$5::uuid)', [
+        supplierId,
+        supplyDate,
+        statusName,
+        jsonb,
+        userId
+      ]);
+    } catch (procErr) {
+      // Если процедура с 5 параметрами не существует, пробуем старую версию (4 параметра)
+      if (procErr.message && procErr.message.includes('не существует')) {
+        await callProcedure('CALL register_supply($1::uuid,$2::date,$3::varchar,$4::jsonb)', [
+          supplierId,
+          supplyDate,
+          statusName,
+          jsonb
+        ]);
+      } else {
+        throw procErr;
+      }
+    }
     return res.status(201).json({ message: 'Supply registered' });
   } catch (err) {
     return next(err);
@@ -46,6 +62,15 @@ export const registerSupply = async (req, res, next) => {
 export const listSupplyStatuses = async (_req, res, next) => {
   try {
     const result = await query('SELECT id, name FROM supply_status ORDER BY name');
+    return res.json(result.rows);
+  } catch (err) {
+    return next(err);
+  }
+};
+
+export const listSuppliers = async (_req, res, next) => {
+  try {
+    const result = await query('SELECT id, name, contact FROM supplier ORDER BY name');
     return res.json(result.rows);
   } catch (err) {
     return next(err);

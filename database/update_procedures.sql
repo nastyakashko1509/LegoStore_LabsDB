@@ -1,3 +1,7 @@
+-- Скрипт для обновления процедур с поддержкой user_id
+-- Выполните этот скрипт в pgAdmin Query Tool или через psql
+
+-- Обновление процедуры register_supply
 CREATE OR REPLACE PROCEDURE register_supply(
     p_supplier_id UUID,
     p_supply_date DATE,
@@ -42,7 +46,7 @@ BEGIN
 END;
 $$;
 
--- Процедура установки скидки на товар
+-- Обновление процедуры set_product_discount
 CREATE OR REPLACE PROCEDURE set_product_discount(
     p_product_id UUID,
     p_percent DECIMAL(5,2),
@@ -74,7 +78,7 @@ BEGIN
 END;
 $$;
 
--- Процедура изменения цены товара
+-- Обновление процедуры update_product_price
 CREATE OR REPLACE PROCEDURE update_product_price(
     p_product_id UUID,
     p_new_price DECIMAL(10,2),
@@ -95,3 +99,5 @@ BEGIN
     COMMIT;
 END;
 $$;
+
+

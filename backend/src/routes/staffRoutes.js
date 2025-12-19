@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { body, param } from 'express-validator';
 import { authenticate, authorize } from '../middleware/authMiddleware.js';
-import { registerSupply, listSupplyStatuses, listSupplies, listSupplyItems, updateSupplyStatus, deleteSupply } from '../controllers/supplyController.js';
+import { registerSupply, listSupplyStatuses, listSupplies, listSupplyItems, updateSupplyStatus, deleteSupply, listSuppliers } from '../controllers/supplyController.js';
 import { setProductDiscount, updateProductPrice } from '../controllers/priceController.js';
 import { listCustomers, updateCustomer, deleteCustomer } from '../controllers/customerController.js';
 
@@ -25,6 +25,8 @@ router.delete('/customers/:id', [param('id').matches(/^[0-9a-fA-F-]{36}$/)], del
 
 // Supplies
 router.get('/supplies', listSupplies);
+router.get('/supplies/statuses', listSupplyStatuses);
+router.get('/suppliers', listSuppliers);
 router.get('/supplies/:id/items', [param('id').matches(/^[0-9a-fA-F-]{36}$/)], listSupplyItems);
 router.post(
   '/supplies',
@@ -38,7 +40,6 @@ router.post(
   ],
   registerSupply
 );
-router.get('/supplies/statuses', listSupplyStatuses);
 router.patch(
   '/supplies/:id',
   [

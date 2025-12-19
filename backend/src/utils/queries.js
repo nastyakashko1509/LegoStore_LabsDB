@@ -18,6 +18,7 @@ export const cartQueries = {
   getTotals: 'SELECT * FROM get_cart_with_totals($1)'
 };
 
+// json_agg() собирает товары в JSON-массив
 export const orderQueries = {
   list: `
     SELECT
